@@ -1,0 +1,17 @@
+.floating-add {
+  right: 30px;
+  bottom: 30px;
+  position: fixed;
+}
+
+.floating-add button {
+  padding: 0.6rem 1.5rem;
+  border-radius: 6rem;
+  font-size: 2rem;
+}
+
+.additem__image-preview {
+  max-width: 300px;
+  max-height: 200px;
+  margin-top: 1rem;
+}

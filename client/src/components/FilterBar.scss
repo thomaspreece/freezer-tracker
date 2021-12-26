@@ -1,0 +1,67 @@
+.filters-container {
+  display: flex;
+  flex-direction: row;
+  background-color: #cccccc;
+}
+
+.filters-container__label {
+  display: flex;
+  flex: 0 0;
+  margin: 1rem;
+}
+
+.filters-container__sort {
+  display: flex;
+  flex: 1 1 auto;
+  padding: 0.5rem;
+
+  .dropdown {
+    display: flex;
+    flex: 1 1 auto;
+
+    button {
+      width: 100%;
+    }
+
+    .dropdown-menu {
+      width: 100%
+    }
+
+    .dropdown-item {
+      padding: 0.5rem 1rem;
+    }
+  }
+}
+
+.filters-container__search {
+  display: flex;
+  flex: 2 2 auto;
+  padding: 0.5rem;
+
+  .react-autosuggest__container {
+    display: flex;
+    flex: 1 1 auto;
+
+    input {
+      width: 100%;
+    }
+  }
+
+  .react-autosuggest__suggestions-container {
+    position: absolute;
+    background-color: white;
+    z-index: 1;
+    top: 3rem;
+    border: 1px solid;
+    padding: 0 1rem;
+
+    .react-autosuggest__suggestions-list {
+      padding: 0;
+    }
+
+    .react-autosuggest__suggestion {
+      padding: 0.5rem 0;
+      list-style: none;
+    }
+  }
+}
