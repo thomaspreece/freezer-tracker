@@ -8,66 +8,10 @@ import 'bootstrap/dist/css/bootstrap.css';
 
 import { Provider } from 'react-redux';
 import { store } from './store/store';
-import { addMany } from './store/freezer_items'
+import { fetchItems } from './store/freezer_items'
 
-store.dispatch(addMany([
-{
-  count: 1,
-  name: "Tofu Katsu",
-  image: "./images/test.jpeg",
-  thumbnail: "./images/test.jpeg",
-  added: "30/11/2021"
-},
-{
-  count: 1,
-  name: "Thai Green Curry",
-  image: "./images/test2.jpeg",
-  thumbnail: "./images/test2.jpeg",
-  added: "25/10/2021"
-},
-{
-  count: 1,
-  name: "Chicken Katsu",
-  image: "./images/test.jpeg",
-  thumbnail: "./images/test.jpeg",
-  added: "30/11/2021"
-},
-{
-  count: 1,
-  name: "Thai Red Curry",
-  image: "./images/test2.jpeg",
-  thumbnail: "./images/test2.jpeg",
-  added: "25/10/2021"
-},
-{
-  count: 1,
-  name: "Tofu Katsu",
-  image: "./images/test.jpeg",
-  thumbnail: "./images/test.jpeg",
-  added: "30/11/2021"
-},
-{
-  count: 1,
-  name: "Thai Green Curry",
-  image: "./images/test2.jpeg",
-  thumbnail: "./images/test2.jpeg",
-  added: "25/10/2021"
-},
-{
-  count: 1,
-  name: "Tofu Katsu",
-  image: "./images/test.jpeg",
-  thumbnail: "./images/test.jpeg",
-  added: "30/11/2021"
-},
-{
-  count: 1,
-  name: "Thai Green Curry",
-  image: "./images/test2.jpeg",
-  thumbnail: "./images/test2.jpeg",
-  added: "25/10/2021"
-}
-]))
+store.dispatch(fetchItems())
+
 
 ReactDOM.render(
   <React.StrictMode>

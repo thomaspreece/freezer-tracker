@@ -11,7 +11,11 @@ import ComplexSwipeContent from './ComplexSwipeContent';
 
 import { SORTS } from '../store/filters';
 
-import { incrementById, decrementById } from '../store/freezer_items'
+import {
+  incrementById,
+  decrementById,
+  changeItemCount
+} from '../store/freezer_items'
 
 const alphabeticalSortAsc = (a,b) => {
   var nameA = a.name.toUpperCase(); // ignore upper and lowercase
@@ -92,6 +96,7 @@ function List() {
         />
       ),
       action: () => {
+        changeItemCount(id, -1)
         dispatch(decrementById(id))
       }
     });
@@ -105,6 +110,7 @@ function List() {
         />
       ),
       action: () => {
+        changeItemCount(id, 1)
         dispatch(incrementById(id))
       }
     });

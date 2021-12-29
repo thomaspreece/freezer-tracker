@@ -18,7 +18,31 @@ function AddItem() {
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
-    const [value, onChange] = useState(new Date());
+    const [added, setAdded] = useState(new Date());
+    const [name, setName] = useState("");
+    const [quantity, setQuantity] = useState(1);
+
+    const handleSave = () => {
+      // Store reference to form to make later code easier to read
+      const form = document.getElementById("additem__form");
+      const image = document.getElementById("formImage").files[0]
+
+      const formData = new FormData(form);
+      formData.append("formImage", image);
+      formData.append("formName", name);
+      formData.append("formAdded",
+        added.getDate() + "/" + (added.getMonth() + 1) + "/" + added.getFullYear()
+      );
+      formData.append("formQuantity", parseInt(quantity, 10));
+
+
+      console.log(formData)
+      // Post data using the Fetch API
+      fetch(form.action, {
+        method: form.method,
+        body: formData,
+      });
+    }
 
     return (
       <div>
@@ -30,29 +54,40 @@ function AddItem() {
             <Modal.Title>Add New Item to Freezer</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <Form>
+            <Form id="additem__form" action="/api/items" method="POST">
               <Row>
                 <Col>
               <Form.Group className="mb-3" controlId="formName">
                 <Form.Label>Name</Form.Label>
-                <Form.Control type="text" placeholder="Enter item name" />
+                <Form.Control
+                  form="additem__form"
+                  type="text"
+                  placeholder="Enter item name"
+                  value={name}
+                  onChange={(evt) => {setName(evt.target.value)}}
+                />
               </Form.Group>
 
 
               <Form.Group className="mb-3" controlId="formQuantity">
                 <Form.Label>Quantity</Form.Label>
-                <Form.Control type="number" defaultValue={1} />
+                <Form.Control
+                  form="additem__form"
+                  type="number"
+                  value={quantity}
+                  onChange={(evt) => {setQuantity(evt.target.value)}}
+                />
               </Form.Group>
               <Form.Group className="mb-3" controlId="formImage">
               <Row>
                 <Col>
                 <Form.Label>Image</Form.Label>
                 <Form.Control
+                  form="additem__form"
                   type="file"
                   accept="image/*"
                   capture="camera"
-                  onChange = {function (evt) {
-                    console.log("HELLO")
+                  onChange = {(evt) => {
                     const src = URL.createObjectURL(evt.target.files[0])
                     document.getElementById('formImagePreview').src = src
                   }}
@@ -69,8 +104,8 @@ function AddItem() {
               <Form.Group className="mb-3" controlId="formAdded">
                 <Form.Label>Date Added</Form.Label>
                 <Calendar
-                  onChange={onChange}
-                  value={value}
+                  onChange={setAdded}
+                  value={added}
                 />
               </Form.Group>
               </Col>
@@ -82,7 +117,7 @@ function AddItem() {
             <Button variant="secondary" onClick={handleClose}>
               Close
             </Button>
-            <Button variant="primary" onClick={handleClose}>
+            <Button variant="primary" onClick={handleSave}>
               Add Item
             </Button>
           </Modal.Footer>
