@@ -1,4 +1,5 @@
 const ws = require('ws')
+const queryString = require('query-string');
 
 const wsServer = new ws.Server({
   noServer: true,
@@ -7,7 +8,7 @@ const wsServer = new ws.Server({
 
 const broadcastMessage = (message) => {
   wsServer.clients.forEach((client) => {
-    if (client.readyState === WebSocket.OPEN) {
+    if (client.readyState === ws.WebSocket.OPEN) {
       client.send(message, { binary: false });
     }
   });
@@ -15,7 +16,7 @@ const broadcastMessage = (message) => {
 
 const setupWebsocket = (server) => {
   wsServer.on('connection', socket => {
-    socket.on('message', message => console.log(message));
+    socket.on('message', message => console.log("WS Connection Message: ", message));
   });
 
   server.on('upgrade', (request, socket, head) => {
@@ -27,16 +28,16 @@ const setupWebsocket = (server) => {
   wsServer.on(
     "connection",
     function connection(websocketConnection, connectionRequest) {
-      const [_path, params] = connectionRequest?.url?.split("?");
-      const connectionParams = queryString.parse(params);
-
-      // NOTE: connectParams are not used here but good to understand how to get
-      // to them if you need to pass data with the connection to identify it (e.g., a userId).
-      console.log(connectionParams);
+      // const [_path, params] = connectionRequest?.url?.split("?");
+      // const connectionParams = queryString.parse(params);
+      //
+      // // NOTE: connectParams are not used here but good to understand how to get
+      // // to them if you need to pass data with the connection to identify it (e.g., a userId).
+      // console.log(connectionParams);
 
       websocketConnection.on("message", (message) => {
         const parsedMessage = JSON.parse(message);
-        console.log(parsedMessage);
+        console.log("WebSocket Message: ", parsedMessage);
         websocketClient.send(JSON.stringify({ message: 'There be gold in them thar hills.' }));
       });
     }

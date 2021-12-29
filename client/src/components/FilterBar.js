@@ -6,6 +6,8 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useState } from "react";
 import Autosuggest from 'react-autosuggest'
 
+import { applyStringFilterToItem } from '../utils/utils'
+
 import './FilterBar.scss';
 
 import { setSort, setFilter } from '../store/filters'
@@ -23,9 +25,7 @@ function FilterBar() {
       const inputValue = value.trim().toLowerCase();
       const inputLength = inputValue.length;
 
-      return inputLength === 0 ? [] : items.filter(item =>
-        item.name.toLowerCase().slice(0, inputLength) === inputValue
-      );
+      return inputLength === 0 ? [] : applyStringFilterToItem(items, inputValue)
     };
 
     // When suggestion is clicked, Autosuggest needs to populate the input
@@ -72,7 +72,7 @@ function FilterBar() {
         <div className="filters-container__sort">
           <DropdownButton title={sort}>
             {Object.values(SORTS).map((sort) => {
-                return (<Dropdown.Item onClick={onDropdownSelect(sort)}>{sort}</Dropdown.Item>)
+                return (<Dropdown.Item key={sort} onClick={onDropdownSelect(sort)}>{sort}</Dropdown.Item>)
             })}
           </DropdownButton>
         </div>

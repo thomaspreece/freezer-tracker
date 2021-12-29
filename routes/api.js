@@ -24,12 +24,12 @@ router.post('/items/:item_id', (req, res) => {
     const count = parseInt(req.body.count, 10);
     const updatedItem = changeItemCount(id, count);
 
-    broadcastMessage({
+    broadcastMessage(JSON.stringify({
       type: "updatedCount",
       payload: updatedItem
-    })
+    }))
 
-    res.status(200).send('OK')
+    res.status(200).json({status: 'OK'})
 })
 
 router.post('/items/', upload.single('formImage'), async (req, res, next) => {
@@ -61,14 +61,14 @@ router.post('/items/', upload.single('formImage'), async (req, res, next) => {
       added: req.body.formAdded
     })
 
-    broadcastMessage({
+    broadcastMessage(JSON.stringify({
       type: "newItem",
       payload: newItem
-    })
+    }))
 
-    res.status(200).send(`OK`);
+    res.status(200).json({status: 'OK'})
   } catch (error) {
-    res.status(500).send('Error');
+    res.status(500).json({status: 'Error'});
     console.log("Error: ")
     console.log(error)
   }

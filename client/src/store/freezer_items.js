@@ -1,9 +1,9 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { v4 as uuidv4 } from 'uuid';
 
 const initialState = {
   items: [],
   status: 'idle',
+  updateStatus: 'idle',
 };
 
 export const fetchItems = createAsyncThunk(
@@ -17,29 +17,41 @@ export const fetchItems = createAsyncThunk(
   }
 )
 
-export const changeItemCount = async (id, count) => {
-  try {
+export const changeItemCount = createAsyncThunk(
+  'freezerItems/changeItemCount',
+  async (data, thunkAPI) => {
+    const id = data.id
+    const count = data.count
     const response = await fetch(`/api/items/${id}`, {
       method: "POST",
-      body: {
-        count
-      }
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({count})
     });
-    if(response.status !== 200) {
-      throw new Error("Invalid response back from server")
-    }
-  } catch (error) {
-    console.log("Error", error)
+    const json = await response.json();
+    return json
   }
-}
+)
 
-const addManyReducer = (state, action) => {
-  // Redux Toolkit allows us to write "mutating" logic in reducers. It
-  // doesn't actually mutate the state because it uses the Immer library,
-  // which detects changes to a "draft state" and produces a brand new
-  // immutable state based off those changes
-  state.items = state.items.concat(action.payload);
-}
+// export const changeItemCount = async (id, count) => {
+//   try {
+//     const response = await fetch(`/api/items/${id}`, {
+//       method: "POST",
+//       headers: {
+//         'Accept': 'application/json',
+//         'Content-Type': 'application/json'
+//       },
+//       body: JSON.stringify({count})
+//     });
+//     if(response.status !== 200) {
+//       throw new Error("Invalid response back from server")
+//     }
+//   } catch (error) {
+//     console.log("Error", error)
+//   }
+// }
 
 export const freezerItemsSlicer = createSlice({
   name: 'freezerItems',
@@ -52,16 +64,22 @@ export const freezerItemsSlicer = createSlice({
       // which detects changes to a "draft state" and produces a brand new
       // immutable state based off those changes
       state.items.push({
-        count: 0,
         ...action.payload,
-        id: uuidv4(),
       });
     },
-    addMany: addManyReducer,
+    addMany: (state, action) => {
+      state.items = state.items.concat(action.payload);
+    },
     removeById: (state, action) => {
       const index = state.items.findIndex((item) => item.id === action.payload)
       if(index !== -1){
         state.items.splice(index,1)
+      }
+    },
+    setCountById: (state, action) => {
+      const index = state.items.findIndex((item) => item.id === action.payload.id)
+      if(index !== -1){
+        state.items[index].count = action.payload.count
       }
     },
     incrementById: (state, action) => {
@@ -84,7 +102,7 @@ export const freezerItemsSlicer = createSlice({
   extraReducers: (builder) => {
     builder.addCase(fetchItems.fulfilled, (state, action) => {
       state.status = "idle"
-      addManyReducer(state, action)
+      state.items = action.payload;
     })
 
     builder.addCase(fetchItems.pending, (state, action) => {
@@ -93,6 +111,18 @@ export const freezerItemsSlicer = createSlice({
 
     builder.addCase(fetchItems.rejected, (state, action) => {
       state.status = "error"
+    })
+
+    builder.addCase(changeItemCount.fulfilled, (state, action) => {
+      state.updateStatus = "idle"
+    })
+
+    builder.addCase(changeItemCount.pending, (state, action) => {
+      state.updateStatus = 'pending'
+    })
+
+    builder.addCase(changeItemCount.rejected, (state, action) => {
+      state.updateStatus = "error"
     })
   },
 });
@@ -103,6 +133,7 @@ export const {
   removeById,
   incrementById,
   decrementById,
+  setCountById,
 } = freezerItemsSlicer.actions;
 
 

@@ -1,5 +1,6 @@
 import { useSelector, useDispatch } from 'react-redux'
 
+import Alert from 'react-bootstrap/Alert'
 import { SwipeableList, SwipeableListItem } from '@sandstreamdev/react-swipeable-list';
 import '@sandstreamdev/react-swipeable-list/dist/styles.css';
 
@@ -10,10 +11,11 @@ import ComplexListItem from './ComplexListItem';
 import ComplexSwipeContent from './ComplexSwipeContent';
 
 import { SORTS } from '../store/filters';
+import { STATUSES } from '../store/websocket';
+
+import { applyStringFilterToItem } from '../utils/utils'
 
 import {
-  incrementById,
-  decrementById,
   changeItemCount
 } from '../store/freezer_items'
 
@@ -50,7 +52,6 @@ const addedSort = (a,b) => {
   const datePartsB = b.added.split("/");
   var dateA = new Date(datePartsA[2], datePartsA[1] - 1, +datePartsA[0]);
   var dateB = new Date(datePartsB[2], datePartsB[1] - 1, +datePartsB[0]);
-  console.log(dateA, dateB)
   if (dateA > dateB) {
     return 1;
   }
@@ -63,12 +64,15 @@ const addedSort = (a,b) => {
 }
 
 function List() {
+  const dispatch = useDispatch()
+
   const sort = useSelector((state) => state.filters.sort)
   const filter = useSelector((state) => state.filters.filter)
-  const lFilter = filter.trim().toLowerCase();
-  const items = useSelector((state) => state.freezerItems.items)
-    .filter((item) => item.count > 0)
-    .filter((item) => lFilter.length === 0 || item.name.toLowerCase().slice(0, lFilter.length) === lFilter)
+  const itemsStatus = useSelector((state) => state.freezerItems.status)
+  const itemsUpdateStatus = useSelector((state) => state.freezerItems.updateStatus)
+  const websocketStatus = useSelector((state) => state.websocket.status)
+  const items = applyStringFilterToItem(useSelector((state) => state.freezerItems.items)
+    .filter((item) => item.count > 0), filter)
 
   switch(sort) {
     case SORTS.ALPHA_ASC:
@@ -79,13 +83,9 @@ function List() {
       break;
     case SORTS.ADDED:
       items.sort(addedSort)
-      console.log("OSDHS")
       break;
     default:
-      console.log("Default")
   }
-
-  const dispatch = useDispatch()
 
     const swipeRightOptions = (id) => ({
       content: (
@@ -96,8 +96,10 @@ function List() {
         />
       ),
       action: () => {
-        changeItemCount(id, -1)
-        dispatch(decrementById(id))
+        dispatch(changeItemCount({
+          id,
+          count: -1
+        }))
       }
     });
 
@@ -110,29 +112,53 @@ function List() {
         />
       ),
       action: () => {
-        changeItemCount(id, 1)
-        dispatch(incrementById(id))
+        dispatch(changeItemCount({
+          id,
+          count: 1
+        }))
       }
     });
 
     return (
-      <SwipeableList>
-        {items.map(({ id, count, name, thumbnail, added }) => (
-          <SwipeableListItem
-            key={id}
-            threshold={0.25}
-            swipeLeft={swipeLeftOptions(id)}
-            swipeRight={swipeRightOptions(id)}
-          >
-            <ComplexListItem
-              count={count}
-              name={name}
-              image={thumbnail}
-              added={added}
-            />
-          </SwipeableListItem>
-        ))}
-      </SwipeableList>
+      <div>
+      {
+        itemsUpdateStatus === "error" ? <Alert variant={'danger'}>
+          Failed to change item count
+        </Alert> : null
+      }
+      {
+        itemsStatus === "pending" ? <Alert variant={'info'}>
+          Refreshing Items
+        </Alert> : null
+      }
+      {
+        itemsStatus === "error" ? <Alert variant={'danger'}>
+          Failed to refresh items
+        </Alert> : null
+      }
+      {
+        websocketStatus === STATUSES.DISCONNECTED ? <Alert variant={'danger'}>
+          Websocket Disconnected - Live Updates Offline
+        </Alert> : null
+      }
+        <SwipeableList>
+          {items.map(({ id, count, name, thumbnail, added }) => (
+            <SwipeableListItem
+              key={id}
+              threshold={0.25}
+              swipeLeft={swipeLeftOptions(id)}
+              swipeRight={swipeRightOptions(id)}
+            >
+              <ComplexListItem
+                count={count}
+                name={name}
+                image={thumbnail}
+                added={added}
+              />
+            </SwipeableListItem>
+          ))}
+        </SwipeableList>
+      </div>
     );
 }
 

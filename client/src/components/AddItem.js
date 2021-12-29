@@ -9,11 +9,14 @@ import Calendar from 'react-calendar'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 
+import Alert from 'react-bootstrap/Alert'
+
 import 'react-calendar/dist/Calendar.css';
 import './AddItem.css'
 
 function AddItem() {
     const [show, setShow] = useState(false);
+    const [saveFailed, setSaveFailed] = useState(false);
 
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
@@ -22,31 +25,43 @@ function AddItem() {
     const [name, setName] = useState("");
     const [quantity, setQuantity] = useState(1);
 
-    const handleSave = () => {
-      // Store reference to form to make later code easier to read
-      const form = document.getElementById("additem__form");
-      const image = document.getElementById("formImage").files[0]
+    const handleSave = async () => {
+      setSaveFailed(false)
 
-      const formData = new FormData(form);
-      formData.append("formImage", image);
-      formData.append("formName", name);
-      formData.append("formAdded",
-        added.getDate() + "/" + (added.getMonth() + 1) + "/" + added.getFullYear()
-      );
-      formData.append("formQuantity", parseInt(quantity, 10));
+      try {
+        // Store reference to form to make later code easier to read
+        const form = document.getElementById("additem__form");
+        const image = document.getElementById("formImage").files[0]
 
+        const formData = new FormData(form);
+        formData.append("formImage", image);
+        formData.append("formName", name);
+        formData.append("formAdded",
+          added.getDate() + "/" + (added.getMonth() + 1) + "/" + added.getFullYear()
+        );
+        formData.append("formQuantity", parseInt(quantity, 10));
 
-      console.log(formData)
-      // Post data using the Fetch API
-      fetch(form.action, {
-        method: form.method,
-        body: formData,
-      });
+        // Post data using the Fetch API
+        const response = await fetch(form.action, {
+          method: form.method,
+          body: formData,
+        });
+
+        if(response.status === 200) {
+          handleClose();
+        } else {
+          setSaveFailed(true)
+        }
+
+      } catch (error) {
+        console.log("Save Item Failed: ", error)
+        setSaveFailed(true)
+      }
     }
 
     return (
       <div>
-        <div class="floating-add">
+        <div className="floating-add">
           <Button variant="primary" onClick={handleShow}>+</Button>
         </div>
         <Modal show={show} onHide={handleClose} fullscreen={true}>
@@ -54,6 +69,9 @@ function AddItem() {
             <Modal.Title>Add New Item to Freezer</Modal.Title>
           </Modal.Header>
           <Modal.Body>
+            {saveFailed === true ? <Alert variant={'danger'}>
+                Saving new item failed
+              </Alert> : null}
             <Form id="additem__form" action="/api/items" method="POST">
               <Row>
                 <Col>
@@ -95,7 +113,7 @@ function AddItem() {
                 />
                 </Col>
                 <Col>
-                <img className="additem__image-preview" id="formImagePreview" />
+                <img alt="preview" className="additem__image-preview" id="formImagePreview" />
                 </Col>
                 </Row>
               </Form.Group>

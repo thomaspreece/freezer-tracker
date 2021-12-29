@@ -10,7 +10,10 @@ import { Provider } from 'react-redux';
 import { store } from './store/store';
 import { fetchItems } from './store/freezer_items'
 
+import { setupWebsocket } from './websocket/websocket'
+
 store.dispatch(fetchItems())
+setupWebsocket(store.dispatch)
 
 
 ReactDOM.render(
