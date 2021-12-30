@@ -1,3 +1,16 @@
+.form-label {
+  font-weight: bold;
+}
+
+.switchselector-category {
+  height: 2.5rem;
+}
+
+.quantity-buttons {
+  width: 100%;
+  margin-top: 5px;
+}
+
 .floating-add {
   right: 30px;
   bottom: 30px;
@@ -14,4 +27,9 @@
   max-width: 300px;
   max-height: 200px;
   margin-top: 1rem;
+  opacity: 0;
+}
+
+.additem__image-preview.preview-shown {
+  opacity: 1;
 }

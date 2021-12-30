@@ -2,9 +2,9 @@
 import Button from 'react-bootstrap/Button'
 import { useState } from "react";
 import Modal from 'react-bootstrap/Modal'
-
 import Form from 'react-bootstrap/Form'
 import Calendar from 'react-calendar'
+import SwitchSelector from "react-switch-selector";
 
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
@@ -13,6 +13,8 @@ import Alert from 'react-bootstrap/Alert'
 
 import 'react-calendar/dist/Calendar.css';
 import './AddItem.css'
+
+import { CATEGORIES } from '../store/filters'
 
 function AddItem() {
     const [show, setShow] = useState(false);
@@ -23,6 +25,7 @@ function AddItem() {
 
     const [added, setAdded] = useState(new Date());
     const [name, setName] = useState("");
+    const [category, setCategory] = useState(CATEGORIES.LEFTOVERS);
     const [quantity, setQuantity] = useState(1);
 
     const handleSave = async () => {
@@ -34,13 +37,14 @@ function AddItem() {
         const image = document.getElementById("formImage").files[0]
 
         const formData = new FormData(form);
-        formData.append("formImage", image);
+
         formData.append("formName", name);
+        formData.append("formCategory", category);
         formData.append("formAdded",
           added.getDate() + "/" + (added.getMonth() + 1) + "/" + added.getFullYear()
         );
         formData.append("formQuantity", parseInt(quantity, 10));
-
+        formData.append("formImage", image);
         // Post data using the Fetch API
         const response = await fetch(form.action, {
           method: form.method,
@@ -58,6 +62,19 @@ function AddItem() {
         setSaveFailed(true)
       }
     }
+
+    const options = [];
+    const switchSelectorOptions = [];
+    Object.values(CATEGORIES).forEach((c) => {
+      options.push(<option>{c}</option>)
+      switchSelectorOptions.push({
+         label: c,
+         value: c,
+         selectedBackgroundColor: "#0d6efd"
+       })
+    })
+
+    const switchSelectorIndex = switchSelectorOptions.findIndex((option) => option.label === category)
 
     return (
       <div>
@@ -86,6 +103,18 @@ function AddItem() {
                 />
               </Form.Group>
 
+              <Form.Group className="mb-3" controlId="formCategory">
+                <Form.Label>Category</Form.Label>
+                <div className="switchselector-category">
+                  <SwitchSelector
+                      onChange={(value) => {setCategory(value)}}
+                      options={switchSelectorOptions}
+                      initialSelectedIndex={switchSelectorIndex}
+                      backgroundColor={"#6c757d"}
+                      fontColor={"#f5f6fa"}
+                  />
+                </div>
+              </Form.Group>
 
               <Form.Group className="mb-3" controlId="formQuantity">
                 <Form.Label>Quantity</Form.Label>
@@ -95,6 +124,18 @@ function AddItem() {
                   value={quantity}
                   onChange={(evt) => {setQuantity(evt.target.value)}}
                 />
+                <Row>
+                  <Col>
+                <Button className="quantity-buttons" variant="secondary" onClick={() => {setQuantity(quantity - 1)}}>
+                  -1
+                </Button>
+              </Col>
+              <Col>
+                <Button className="quantity-buttons" variant="secondary" onClick={() => {setQuantity(quantity + 1)}}>
+                  +1
+                </Button>
+                </Col>
+              </Row>
               </Form.Group>
               <Form.Group className="mb-3" controlId="formImage">
               <Row>
@@ -107,13 +148,14 @@ function AddItem() {
                   capture="camera"
                   onChange = {(evt) => {
                     const src = URL.createObjectURL(evt.target.files[0])
-                    document.getElementById('formImagePreview').src = src
+                    const element = document.getElementById('formImagePreview')
+                    element.src = src
+                    element.classList.add("preview-shown");
                   }}
-
                 />
                 </Col>
                 <Col>
-                <img alt="preview" className="additem__image-preview" id="formImagePreview" />
+                  <img alt="preview" className="additem__image-preview" id="formImagePreview" />
                 </Col>
                 </Row>
               </Form.Group>
@@ -129,7 +171,6 @@ function AddItem() {
               </Col>
               </Row>
             </Form>
-
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={handleClose}>

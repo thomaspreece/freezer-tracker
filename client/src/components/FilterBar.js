@@ -1,7 +1,7 @@
 import DropdownButton from 'react-bootstrap/DropdownButton'
 import Dropdown from 'react-bootstrap/Dropdown'
 
-import { SORTS } from '../store/filters'
+import { SORTS, ALL_CATEGORIES } from '../store/filters'
 import { useSelector, useDispatch } from 'react-redux'
 import { useState } from "react";
 import Autosuggest from 'react-autosuggest'
@@ -10,10 +10,15 @@ import { applyStringFilterToItem } from '../utils/utils'
 
 import './FilterBar.scss';
 
-import { setSort, setFilter } from '../store/filters'
+import {
+  setSort,
+  setFilter,
+  setCategory
+} from '../store/filters'
 
 function FilterBar() {
     const sort = useSelector((state) => state.filters.sort)
+    const category = useSelector((state) => state.filters.category)
     const filter = useSelector((state) => state.filters.filter)
     const items = useSelector((state) => state.freezerItems.items)
     const dispatch = useDispatch()
@@ -51,8 +56,12 @@ function FilterBar() {
       setSuggestions([]);
     };
 
-    const onDropdownSelect = (sort) => (eventKey, event) => {
+    const onSortDropdownSelect = (sort) => (eventKey, event) => {
       dispatch(setSort(sort));
+    }
+
+    const onCategoryDropdownSelect = (category) => (eventKey, event) => {
+      dispatch(setCategory(category));
     }
 
     const onChange = (event, { newValue }) => {
@@ -69,10 +78,18 @@ function FilterBar() {
     return (
       <div className="filters-container">
         <div className="filters-container__label">Sort:</div>
-        <div className="filters-container__sort">
+        <div className="filters-container__dropdown">
           <DropdownButton title={sort}>
             {Object.values(SORTS).map((sort) => {
-                return (<Dropdown.Item key={sort} onClick={onDropdownSelect(sort)}>{sort}</Dropdown.Item>)
+                return (<Dropdown.Item key={sort} onClick={onSortDropdownSelect(sort)}>{sort}</Dropdown.Item>)
+            })}
+          </DropdownButton>
+        </div>
+        <div className="filters-container__label">Category:</div>
+        <div className="filters-container__dropdown">
+          <DropdownButton title={category}>
+            {Object.values(ALL_CATEGORIES).map((category) => {
+                return (<Dropdown.Item key={category} onClick={onCategoryDropdownSelect(category)}>{category}</Dropdown.Item>)
             })}
           </DropdownButton>
         </div>

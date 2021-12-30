@@ -7,9 +7,21 @@ export const SORTS={
   ADDED: "Added (Oldest)"
 }
 
+export const CATEGORIES = {
+  LEFTOVERS: "Leftovers",
+  MEAT: "Meat",
+  OTHER: "Other"
+}
+
+export const ALL_CATEGORIES = {
+  ALL: "All",
+  ...CATEGORIES
+}
+
 const initialState = {
   filter: "",
   sort: SORTS.DEFAULT,
+  category: ALL_CATEGORIES.ALL,
 };
 
 
@@ -19,19 +31,16 @@ export const filtersSlicer = createSlice({
   // The `reducers` field lets us define reducers and generate associated actions
   reducers: {
     setFilter: (state, action) => {
-      // Redux Toolkit allows us to write "mutating" logic in reducers. It
-      // doesn't actually mutate the state because it uses the Immer library,
-      // which detects changes to a "draft state" and produces a brand new
-      // immutable state based off those changes
       state.filter = action.payload;
     },
     setSort: (state, action) => {
-      // Redux Toolkit allows us to write "mutating" logic in reducers. It
-      // doesn't actually mutate the state because it uses the Immer library,
-      // which detects changes to a "draft state" and produces a brand new
-      // immutable state based off those changes
       if(Object.values(SORTS).includes(action.payload)) {
         state.sort = action.payload;
+      }
+    },
+    setCategory: (state, action) => {
+      if(Object.values(ALL_CATEGORIES).includes(action.payload)) {
+        state.category = action.payload;
       }
     },
   },
@@ -43,6 +52,7 @@ export const filtersSlicer = createSlice({
 export const {
   setFilter,
   setSort,
+  setCategory,
 } = filtersSlicer.actions;
 
 export default filtersSlicer.reducer;

@@ -56,6 +56,7 @@ router.post('/items/', upload.single('formImage'), async (req, res, next) => {
       id,
       count: parseInt(req.body.formQuantity, 10),
       name: req.body.formName,
+      category: req.body.formCategory,
       image: `images/${id}.jpg`,
       thumbnail: `images/thumbs/${id}.jpg`,
       added: req.body.formAdded

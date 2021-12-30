@@ -12,7 +12,7 @@ import ComplexSwipeContent from './ComplexSwipeContent';
 
 import { CSSTransition } from 'react-transition-group';
 
-import { SORTS } from '../store/filters';
+import { SORTS, ALL_CATEGORIES } from '../store/filters';
 import { STATUSES } from '../store/websocket';
 
 import { applyStringFilterToItem } from '../utils/utils'
@@ -89,11 +89,13 @@ function List() {
 
   const sort = useSelector((state) => state.filters.sort)
   const filter = useSelector((state) => state.filters.filter)
+  const category = useSelector((state) => state.filters.category)
   const itemsStatus = useSelector((state) => state.freezerItems.status)
   const itemsUpdateStatus = useSelector((state) => state.freezerItems.updateStatus)
   const websocketStatus = useSelector((state) => state.websocket.status)
   const items = applyStringFilterToItem(useSelector((state) => state.freezerItems.items)
     .filter((item) => item.count > 0), filter)
+    .filter((item) => (category === ALL_CATEGORIES.ALL || item.category === category) )
 
   switch(sort) {
     case SORTS.DEFAULT:
@@ -166,7 +168,7 @@ function List() {
         </Alert> : null
       }
         <SwipeableList>
-          {items.map(({ id, count, name, thumbnail, added }) => (
+          {items.map(({ id, count, name, thumbnail, added, category }) => (
             <CSSTransition timeout={2000} in={true} appear={true} classNames="listitem">
               <SwipeableListItem
                 key={id}
@@ -178,6 +180,7 @@ function List() {
                   <ComplexListItem
                     count={count}
                     name={name}
+                    category={category}
                     image={thumbnail}
                     added={added}
                   />

@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { CSSTransition } from 'react-transition-group';
+import ComplexListItemCount from './ComplexListItemCount'
 
 import './ComplexListItem.css';
 
-const ComplexListItem = ({ count, name, image, added }) => (
+const ComplexListItem = ({ count, name, image, added, category }) => (
   <div className="complex-swipeable-list__item">
     <div className="complex-swipeable-list__item-image-container">
       <div className="complex-swipeable-list__item-image-margin"></div>
@@ -16,13 +16,12 @@ const ComplexListItem = ({ count, name, image, added }) => (
       <span className="complex-swipeable-list__item-name">
         <span>{name}</span>
       </span>
-      <span className="complex-swipeable-list__item-added">{added}</span>
+      <span className="complex-swipeable-list__item-added">Added: {added}</span>
+      <span className="complex-swipeable-list__item-added">Category: {category}</span>
     </div>
 
     <div className="complex-swipeable-list__item-count-container">
-      <CSSTransition key={count} timeout={200} appear={true} in={true} classNames="listitemcount">
-        <div key={count} className="complex-swipeable-list__item-count">{count}</div>
-      </CSSTransition>
+      <ComplexListItemCount count={count} />
     </div>
   </div>
 );
@@ -31,6 +30,7 @@ ComplexListItem.propTypes = {
   count: PropTypes.number,
   name: PropTypes.string,
   image: PropTypes.string,
+  category: PropTypes.string,
   added: PropTypes.string,
 };
 
