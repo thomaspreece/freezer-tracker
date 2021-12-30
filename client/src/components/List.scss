@@ -1,0 +1,15 @@
+.listitem-appear {
+  opacity: 0;
+}
+.listitem-appear-active {
+  opacity: 1;
+  transition: opacity 2000ms;
+}
+
+.listitem-exit {
+  opacity: 0;
+}
+.listitem-exit-active {
+  opacity: 1;
+  transition: opacity 2000ms;
+}

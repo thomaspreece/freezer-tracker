@@ -10,10 +10,14 @@ import { mdiPlus, mdiMinus } from '@mdi/js'
 import ComplexListItem from './ComplexListItem';
 import ComplexSwipeContent from './ComplexSwipeContent';
 
+import { CSSTransition } from 'react-transition-group';
+
 import { SORTS } from '../store/filters';
 import { STATUSES } from '../store/websocket';
 
 import { applyStringFilterToItem } from '../utils/utils'
+
+import './List.scss'
 
 import {
   changeItemCount
@@ -40,6 +44,23 @@ const alphabeticalSortDsc = (a,b) => {
     return 1;
   }
   if (nameA > nameB) {
+    return -1;
+  }
+
+  // names must be equal
+  return 0;
+}
+
+
+const addedSortRev = (a,b) => {
+  const datePartsA = a.added.split("/");
+  const datePartsB = b.added.split("/");
+  var dateA = new Date(datePartsA[2], datePartsA[1] - 1, +datePartsA[0]);
+  var dateB = new Date(datePartsB[2], datePartsB[1] - 1, +datePartsB[0]);
+  if (dateA < dateB) {
+    return 1;
+  }
+  if (dateA > dateB) {
     return -1;
   }
 
@@ -75,6 +96,9 @@ function List() {
     .filter((item) => item.count > 0), filter)
 
   switch(sort) {
+    case SORTS.DEFAULT:
+      items.sort(addedSortRev)
+      break;
     case SORTS.ALPHA_ASC:
       items.sort(alphabeticalSortAsc)
       break;
@@ -143,19 +167,23 @@ function List() {
       }
         <SwipeableList>
           {items.map(({ id, count, name, thumbnail, added }) => (
-            <SwipeableListItem
-              key={id}
-              threshold={0.25}
-              swipeLeft={swipeLeftOptions(id)}
-              swipeRight={swipeRightOptions(id)}
-            >
-              <ComplexListItem
-                count={count}
-                name={name}
-                image={thumbnail}
-                added={added}
-              />
-            </SwipeableListItem>
+            <CSSTransition timeout={2000} in={true} appear={true} classNames="listitem">
+              <SwipeableListItem
+                key={id}
+                threshold={0.25}
+                swipeLeft={swipeLeftOptions(id)}
+                swipeRight={swipeRightOptions(id)}
+              >
+
+                  <ComplexListItem
+                    count={count}
+                    name={name}
+                    image={thumbnail}
+                    added={added}
+                  />
+
+              </SwipeableListItem>
+            </CSSTransition>
           ))}
         </SwipeableList>
       </div>

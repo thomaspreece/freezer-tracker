@@ -1,3 +1,15 @@
+.complex-swipeable-list__item-count {
+  background-color: #ffaaaa;
+  border-radius: 10px;
+}
+
+.listitemcount-enter-done {
+  background-color: unset;
+  -webkit-transition: background-color 1000ms linear;
+  -ms-transition: background-color 1000ms linear;
+  transition: background-color 1000ms linear;
+}
+
 .complex-swipeable-list__item {
   background-color: white;
   padding: 10px;

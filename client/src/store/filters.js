@@ -1,10 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 export const SORTS={
-  DEFAULT: "Default",
+  DEFAULT: "Added (Newest)",
   ALPHA_ASC: "Alphabetical (Asc)",
   ALPHA_DSC: "Alphabetical (Dsc)",
-  ADDED: "Added"
+  ADDED: "Added (Oldest)"
 }
 
 const initialState = {

@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import { CSSTransition } from 'react-transition-group';
+
 import './ComplexListItem.css';
 
 const ComplexListItem = ({ count, name, image, added }) => (
@@ -18,7 +20,9 @@ const ComplexListItem = ({ count, name, image, added }) => (
     </div>
 
     <div className="complex-swipeable-list__item-count-container">
-      <div className="complex-swipeable-list__item-count">{count}</div>
+      <CSSTransition key={count} timeout={200} appear={true} in={true} classNames="listitemcount">
+        <div key={count} className="complex-swipeable-list__item-count">{count}</div>
+      </CSSTransition>
     </div>
   </div>
 );
