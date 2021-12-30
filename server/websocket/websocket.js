@@ -15,11 +15,9 @@ const broadcastMessage = (message) => {
 }
 
 const setupWebsocket = (server) => {
-  wsServer.on('connection', socket => {
-    socket.on('message', message => console.log("WS Connection Message: ", message));
-  });
-
   server.on('upgrade', (request, socket, head) => {
+    console.log("WS Upgrade")
+
     wsServer.handleUpgrade(request, socket, head, socket => {
       wsServer.emit('connection', socket, request);
     });
@@ -35,10 +33,16 @@ const setupWebsocket = (server) => {
       // // to them if you need to pass data with the connection to identify it (e.g., a userId).
       // console.log(connectionParams);
 
+      console.log("WS Connection", connectionRequest.url, connectionRequest.headers.host)
+
       websocketConnection.on("message", (message) => {
-        const parsedMessage = JSON.parse(message);
-        console.log("WebSocket Message: ", parsedMessage);
-        websocketClient.send(JSON.stringify({ message: 'There be gold in them thar hills.' }));
+        try {
+          const parsedMessage = JSON.parse(message);
+          console.log("WebSocket Message: ", parsedMessage);
+          websocketClient.send(JSON.stringify({ message: 'There be gold in them thar hills.' }));
+        } catch (error) {
+          console.log("WebSocket Error")
+        }
       });
     }
   );
