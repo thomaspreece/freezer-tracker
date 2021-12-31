@@ -2,7 +2,14 @@ import {setCountById, add} from '../store/freezer_items'
 import { STATUSES, setStatus } from '../store/websocket'
 
 export const setupWebsocket = (dispatch) => {
-  const ws = new WebSocket(`ws://${window.location.host}/api/ws`)
+
+  let ws;
+  if (window.location.protocol === "http:") {
+      ws = new WebSocket(`ws://${window.location.host}/api/ws`)
+  } else {
+      ws = new WebSocket(`wss://${window.location.host}/api/ws`)
+  }
+
 
   ws.onopen = () => {
     // on connecting, do nothing but log it to the console
