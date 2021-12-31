@@ -1,7 +1,7 @@
 const fs = require('fs')
 
 const getDatabase = () => {
-  const data = fs.readFileSync('./public/database.json', 'utf8');
+  const data = fs.readFileSync('./public/database/database.json', 'utf8');
   const json = JSON.parse(data);
   return json
 }
@@ -9,7 +9,7 @@ const getDatabase = () => {
 
 const saveDatabase = (json) => {
     const data = JSON.stringify(json);
-    fs.writeFileSync('./public/database.json', data, 'utf8');
+    fs.writeFileSync('./public/database/database.json', data, 'utf8');
 }
 
 const addItem = (item) => {

@@ -6,6 +6,9 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useState } from "react";
 import Autosuggest from 'react-autosuggest'
 
+import Row from 'react-bootstrap/Row'
+import Col from 'react-bootstrap/Col'
+
 import { applyStringFilterToItem } from '../utils/utils'
 
 import './FilterBar.scss';
@@ -77,35 +80,48 @@ function FilterBar() {
 
     return (
       <div className="filters-container">
-        <div className="filters-container__label">Sort:</div>
-        <div className="filters-container__dropdown">
-          <DropdownButton title={sort}>
-            {Object.values(SORTS).map((sort) => {
-                return (<Dropdown.Item key={sort} onClick={onSortDropdownSelect(sort)}>{sort}</Dropdown.Item>)
-            })}
-          </DropdownButton>
-        </div>
-        <div className="filters-container__label">Category:</div>
-        <div className="filters-container__dropdown">
-          <DropdownButton title={category}>
-            {Object.values(ALL_CATEGORIES).map((category) => {
-                return (<Dropdown.Item key={category} onClick={onCategoryDropdownSelect(category)}>{category}</Dropdown.Item>)
-            })}
-          </DropdownButton>
-        </div>
-        <div className="filters-container__label">Search:</div>
-        <div className="filters-container__search">
-          <Autosuggest
-            suggestions={suggestions}
-            onSuggestionsFetchRequested={onSuggestionsFetchRequested}
-            onSuggestionsClearRequested={onSuggestionsClearRequested}
-            getSuggestionValue={getSuggestionValue}
-            renderSuggestion={renderSuggestion}
-            inputProps={inputProps}
-          />
-        </div>
+        <Row>
+          <Col xs={12} sm={6} md={4}>
+            <div className="filters-container__col">
+              <div className="filters-container__label">Sort:</div>
+              <div className="filters-container__dropdown">
+                <DropdownButton title={sort}>
+                  {Object.values(SORTS).map((sort) => {
+                      return (<Dropdown.Item key={sort} onClick={onSortDropdownSelect(sort)}>{sort}</Dropdown.Item>)
+                  })}
+                </DropdownButton>
+              </div>
+            </div>
+          </Col>
+          <Col xs={12} sm={6} md={4}>
+            <div className="filters-container__col">
+              <div className="filters-container__label">Category:</div>
+              <div className="filters-container__dropdown">
+                <DropdownButton title={category}>
+                  {Object.values(ALL_CATEGORIES).map((category) => {
+                      return (<Dropdown.Item key={category} onClick={onCategoryDropdownSelect(category)}>{category}</Dropdown.Item>)
+                  })}
+                </DropdownButton>
+              </div>
+            </div>
+          </Col>
+          <Col xs={12} sm={12} md={4}>
+            <div className="filters-container__col">
+              <div className="filters-container__label">Search:</div>
+              <div className="filters-container__search">
+                <Autosuggest
+                  suggestions={suggestions}
+                  onSuggestionsFetchRequested={onSuggestionsFetchRequested}
+                  onSuggestionsClearRequested={onSuggestionsClearRequested}
+                  getSuggestionValue={getSuggestionValue}
+                  renderSuggestion={renderSuggestion}
+                  inputProps={inputProps}
+                />
+              </div>
+            </div>
+          </Col>
+        </Row>
       </div>
-
     );
 }
 

@@ -7,10 +7,11 @@ import './ComplexListItem.css';
 
 const ComplexListItem = ({ count, name, image, added, category }) => (
   <div className="complex-swipeable-list__item">
-    <div className="complex-swipeable-list__item-image-container">
-      <div className="complex-swipeable-list__item-image-margin"></div>
-      <img className="complex-swipeable-list__item-image" alt="item preview" src={image} />
-      <div className="complex-swipeable-list__item-image-margin"></div>
+    <div className="complex-swipeable-list__item-image-container"
+      style={{
+        "backgroundImage": `url(${image})`
+      }}
+    >
     </div>
     <div className="complex-swipeable-list__item-label">
       <span className="complex-swipeable-list__item-name">

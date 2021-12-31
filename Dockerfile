@@ -6,8 +6,9 @@ COPY ./server/package*.json ./
 COPY ./server .
 COPY ./client/build ./public
 
-RUN mkdir -p ./server/public/images
-RUN mkdir -p ./server/public/images/thumbs
+RUN mkdir -p ./public/database
+RUN mkdir -p ./public/images
+RUN mkdir -p ./public/images/thumbs
 
 RUN npm install
 

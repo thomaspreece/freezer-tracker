@@ -1,7 +1,10 @@
 .filters-container {
+  background-color: #cccccc;
+}
+
+.filters-container__col {
   display: flex;
   flex-direction: row;
-  background-color: #cccccc;
 }
 
 .filters-container__label {
