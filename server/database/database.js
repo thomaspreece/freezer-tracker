@@ -19,6 +19,18 @@ const addItem = (item) => {
     return item;
 }
 
+const changeItemAdded = (id, added) => {
+    const json = getDatabase();
+    const index = json.findIndex((item) => item.id === id)
+    if(index !== -1) {
+      json[index].added = added
+    } else {
+      console.log(`Could not find ${id}`)
+    }
+    saveDatabase(json);
+    return json[index];
+}
+
 const changeItemCount = (id, count) => {
     const json = getDatabase();
     const index = json.findIndex((item) => item.id === id)
@@ -40,4 +52,5 @@ module.exports = {
   addItem,
   getItems,
   changeItemCount,
+  changeItemAdded,
 }

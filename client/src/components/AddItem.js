@@ -16,6 +16,8 @@ import './AddItem.css'
 
 import { CATEGORIES } from '../store/filters'
 
+import List from './List'
+
 function AddItem() {
     const [show, setShow] = useState(false);
     const [saveFailed, setSaveFailed] = useState(false);
@@ -27,15 +29,91 @@ function AddItem() {
     const [name, setName] = useState("");
     const [category, setCategory] = useState(CATEGORIES.LEFTOVERS);
     const [quantity, setQuantity] = useState(1);
+    const [imageSuggestions, setImageSuggestions] = useState({
+      search: "",
+      suggestions: [],
+      inProgress: false,
+      error: false,
+    })
+    const [selectedImageSuggestion, setSelectedImageSuggestion] = useState(0);
+
+    const IMAGE_PREVIEW_MODES = {
+      HIDDEN: "hidden",
+      SUGGESTION: "suggestion",
+      UPLOAD: "upload"
+    }
+
+    const [imagePreviewMode, setImagePreviewMode] = useState(IMAGE_PREVIEW_MODES.HIDDEN)
+
+    const hasImageSuggestions = (imageSuggestions.search !== "" &&
+      imageSuggestions.search === name &&
+      imageSuggestions.suggestions.length > 0 &&
+      imageSuggestions.error === false &&
+      imageSuggestions.inProgress === false)
+
+    const noImageSuggestions = (imageSuggestions.search !== "" &&
+      imageSuggestions.search === name &&
+      imageSuggestions.suggestions.length === 0 &&
+      imageSuggestions.error === false &&
+      imageSuggestions.inProgress === false)
+
+    const imageSelected = (evt) => {
+      setImagePreviewMode(IMAGE_PREVIEW_MODES.UPLOAD)
+      const src = URL.createObjectURL(evt.target.files[0])
+      const element = document.getElementById('formImagePreview')
+      element.src = src
+    }
+
+    const suggestImage = async () => {
+      try {
+        setImagePreviewMode(IMAGE_PREVIEW_MODES.SUGGESTION)
+        setSelectedImageSuggestion(0)
+
+        if (imageSuggestions.search === name && imageSuggestions.error === false) {
+          return
+        }
+
+        setImageSuggestions({
+          search: name,
+          suggestions: [],
+          inProgress: true,
+          error: false,
+        })
+
+        const response = await fetch("/api/images/suggest", {
+          method: "POST",
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({search: name}),
+        });
+        const json = await response.json();
+        const urls = json.map((suggestion) => suggestion.url)
+
+        setImageSuggestions({
+          search: name,
+          suggestions: urls,
+          inProgress: false,
+          error: false,
+        })
+
+      } catch(error) {
+        setImageSuggestions({
+          search: name,
+          suggestions: [],
+          inProgress: false,
+          error: true,
+        })
+      }
+
+    }
 
     const handleSave = async () => {
       setSaveFailed(false)
 
       try {
-        // Store reference to form to make later code easier to read
         const form = document.getElementById("additem__form");
-        const image = document.getElementById("formImage").files[0]
-
         const formData = new FormData(form);
 
         formData.append("formName", name);
@@ -44,7 +122,16 @@ function AddItem() {
           added.getDate() + "/" + (added.getMonth() + 1) + "/" + added.getFullYear()
         );
         formData.append("formQuantity", parseInt(quantity, 10));
-        formData.append("formImage", image);
+
+        if (imagePreviewMode === IMAGE_PREVIEW_MODES.UPLOAD) {
+          const image = document.getElementById("formImage").files[0]
+          formData.append("formImage", image);
+        } else if (imagePreviewMode === IMAGE_PREVIEW_MODES.SUGGESTION) {
+          formData.append("formImageFetchUrl", imageSuggestions.suggestions[selectedImageSuggestion]);
+        } else {
+          return
+        }
+
         // Post data using the Fetch API
         const response = await fetch(form.action, {
           method: form.method,
@@ -89,9 +176,19 @@ function AddItem() {
             {saveFailed === true ? <Alert variant={'danger'}>
                 Saving new item failed
               </Alert> : null}
+
+            {imageSuggestions.inProgress === true ? <Alert variant={'info'}>
+                Loading Suggestions
+              </Alert> : null}
+            {imageSuggestions.error === true ? <Alert variant={'danger'}>
+                Error obtaining image suggestions
+              </Alert> : null}
+            {noImageSuggestions === true ? <Alert variant={'warning'}>
+                Could not find any suggestions for image
+              </Alert> : null}
             <Form id="additem__form" action="/api/items" method="POST">
               <Row>
-                <Col>
+                <Col xs={12} md={12} lg={7}>
               <Form.Group className="mb-3" controlId="formName">
                 <Form.Label>Name</Form.Label>
                 <Form.Control
@@ -101,6 +198,8 @@ function AddItem() {
                   value={name}
                   onChange={(evt) => {setName(evt.target.value)}}
                 />
+                <List ignoreStoredFilterAndSort={true} overrideFilter={name} />
+                <hr />
               </Form.Group>
 
               <Form.Group className="mb-3" controlId="formCategory">
@@ -114,6 +213,7 @@ function AddItem() {
                       fontColor={"#f5f6fa"}
                   />
                 </div>
+                <hr />
               </Form.Group>
 
               <Form.Group className="mb-3" controlId="formQuantity">
@@ -125,7 +225,7 @@ function AddItem() {
                   onChange={(evt) => {setQuantity(evt.target.value)}}
                 />
                 <Row>
-                  <Col>
+                  <Col xs={12} md={12} lg={5}>
                 <Button className="quantity-buttons" variant="secondary" onClick={() => {setQuantity(quantity - 1)}}>
                   -1
                 </Button>
@@ -136,28 +236,45 @@ function AddItem() {
                 </Button>
                 </Col>
               </Row>
+              <hr />
               </Form.Group>
               <Form.Group className="mb-3" controlId="formImage">
               <Row>
                 <Col>
-                <Form.Label>Image</Form.Label>
-                <Form.Control
-                  form="additem__form"
-                  type="file"
-                  accept="image/*"
-                  capture="camera"
-                  onChange = {(evt) => {
-                    const src = URL.createObjectURL(evt.target.files[0])
-                    const element = document.getElementById('formImagePreview')
-                    element.src = src
-                    element.classList.add("preview-shown");
-                  }}
-                />
+                  <Form.Label>Image</Form.Label>
+                  <Form.Control
+                    form="additem__form"
+                    type="file"
+                    accept="image/*"
+                    capture="camera"
+                    onChange = {imageSelected}
+                  />
+                  <Button className="quantity-buttons" variant="secondary" onClick={() => {suggestImage()}} disabled={imageSuggestions.inProgress}>
+                    Suggest Image
+                  </Button>
                 </Col>
                 <Col>
-                  <img alt="preview" className="additem__image-preview" id="formImagePreview" />
+                  <img alt="preview" className={`additem__image-preview ${imagePreviewMode === IMAGE_PREVIEW_MODES.UPLOAD ? "preview-shown" : ""}`} id="formImagePreview" />
+                  <div className={`additem__image-suggestion ${imagePreviewMode === IMAGE_PREVIEW_MODES.SUGGESTION && hasImageSuggestions ? "preview-shown" : ""}`} >
+                    <Button className="quantity-buttons" variant="secondary" onClick={() => {
+                        if((selectedImageSuggestion - 1) <= -1) {
+                          setSelectedImageSuggestion(imageSuggestions.suggestions.length - 1)
+                        } else {
+                          setSelectedImageSuggestion(selectedImageSuggestion - 1)}
+                        }
+                      }>{"<"}</Button>
+                    <img alt="preview" className="additem__image-suggestion-preview" src={imageSuggestions.suggestions[selectedImageSuggestion]} id="formImageSuggestionPreview"/>
+                    <Button className="quantity-buttons" variant="secondary" onClick={() => {
+                        if(selectedImageSuggestion + 1 >= imageSuggestions.suggestions.length) {
+                          setSelectedImageSuggestion(0)
+                        } else {
+                          setSelectedImageSuggestion(selectedImageSuggestion + 1)
+                        }
+                      }}>{">"}</Button>
+                  </div>
                 </Col>
                 </Row>
+                <hr />
               </Form.Group>
               </Col>
               <Col>

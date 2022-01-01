@@ -27,9 +27,24 @@
   max-width: 300px;
   max-height: 200px;
   margin-top: 1rem;
-  opacity: 0;
+  display: none;
 }
 
 .additem__image-preview.preview-shown {
-  opacity: 1;
+  display: block;
+}
+
+.additem__image-suggestion-preview {
+  max-width: 300px;
+  max-height: 200px;
+  margin-top: 1rem;
+}
+
+.additem__image-suggestion {
+  display: none;
+}
+
+.additem__image-suggestion.preview-shown {
+  display: flex;
+  flex-direction: row;
 }

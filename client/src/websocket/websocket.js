@@ -1,4 +1,4 @@
-import {setCountById, add} from '../store/freezer_items'
+import {setCountById, setAddedById, add} from '../store/freezer_items'
 import { STATUSES, setStatus } from '../store/websocket'
 
 export const setupWebsocket = (dispatch) => {
@@ -25,9 +25,15 @@ export const setupWebsocket = (dispatch) => {
       case "updatedCount":
         dispatch(setCountById({
           id: message.payload.id,
-          count: message.payload.count
+          count: message.payload.count,
         }))
         break;
+      case "updatedAdded":
+        dispatch(setAddedById({
+          id: message.payload.id,
+          added: message.payload.added,
+        }))
+      break;
       case "newItem":
         dispatch(add(message.payload))
         break;

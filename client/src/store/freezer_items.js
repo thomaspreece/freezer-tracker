@@ -22,13 +22,18 @@ export const changeItemCount = createAsyncThunk(
   async (data, thunkAPI) => {
     const id = data.id
     const count = data.count
+    const added = data.added
+    let body = {count}
+    if(data.added) {
+      body.added = data.added
+    }
     const response = await fetch(`/api/items/${id}`, {
       method: "POST",
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({count})
+      body: JSON.stringify(body)
     });
     const json = await response.json();
     return json
@@ -74,6 +79,12 @@ export const freezerItemsSlicer = createSlice({
       const index = state.items.findIndex((item) => item.id === action.payload)
       if(index !== -1){
         state.items.splice(index,1)
+      }
+    },
+    setAddedById: (state, action) => {
+      const index = state.items.findIndex((item) => item.id === action.payload.id)
+      if(index !== -1){
+        state.items[index].added = action.payload.added
       }
     },
     setCountById: (state, action) => {
@@ -134,6 +145,7 @@ export const {
   incrementById,
   decrementById,
   setCountById,
+  setAddedById,
 } = freezerItemsSlicer.actions;
 
 

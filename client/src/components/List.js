@@ -84,7 +84,8 @@ const addedSort = (a,b) => {
   return 0;
 }
 
-function List() {
+function List({ignoreStoredFilterAndSort, overrideFilter}) {
+
   const dispatch = useDispatch()
 
   const sort = useSelector((state) => state.filters.sort)
@@ -93,27 +94,41 @@ function List() {
   const itemsStatus = useSelector((state) => state.freezerItems.status)
   const itemsUpdateStatus = useSelector((state) => state.freezerItems.updateStatus)
   const websocketStatus = useSelector((state) => state.websocket.status)
-  const items = applyStringFilterToItem(useSelector((state) => state.freezerItems.items)
-    .filter((item) => item.count > 0), filter)
-    .filter((item) => (category === ALL_CATEGORIES.ALL || item.category === category) )
+  const storedItems = useSelector((state) => state.freezerItems.items)
 
-  switch(sort) {
-    case SORTS.DEFAULT:
-      items.sort(addedSortRev)
-      break;
-    case SORTS.ALPHA_ASC:
-      items.sort(alphabeticalSortAsc)
-      break;
-    case SORTS.ALPHA_DSC:
-      items.sort(alphabeticalSortDsc)
-      break;
-    case SORTS.ADDED:
-      items.sort(addedSort)
-      break;
-    default:
+  let items;
+  if(ignoreStoredFilterAndSort) {
+    if(overrideFilter === "") {
+      items = []
+    } else {
+      items = applyStringFilterToItem([
+        ...storedItems.filter((item) => item.count === 0),
+        ...storedItems.filter((item) => item.count > 0),
+      ], overrideFilter)
+    }
+  } else {
+    items = applyStringFilterToItem(storedItems.filter((item) => item.count > 0), filter)
+      .filter((item) => (category === ALL_CATEGORIES.ALL || item.category === category) )
+
+    switch(sort) {
+      case SORTS.DEFAULT:
+        items.sort(addedSortRev)
+        break;
+      case SORTS.ALPHA_ASC:
+        items.sort(alphabeticalSortAsc)
+        break;
+      case SORTS.ALPHA_DSC:
+        items.sort(alphabeticalSortDsc)
+        break;
+      case SORTS.ADDED:
+        items.sort(addedSort)
+        break;
+      default:
+    }
   }
 
-    const swipeRightOptions = (id) => ({
+
+    const swipeRightOptions = (id, count) => ({
       content: (
         <ComplexSwipeContent
           icon={<Icon path={mdiMinus}/>}
@@ -129,7 +144,7 @@ function List() {
       }
     });
 
-    const swipeLeftOptions = (id) => ({
+    const swipeLeftOptions = (id, count) => ({
       content: (
         <ComplexSwipeContent
           icon={<Icon path={mdiPlus}/>}
@@ -138,10 +153,19 @@ function List() {
         />
       ),
       action: () => {
-        dispatch(changeItemCount({
-          id,
-          count: 1
-        }))
+        if(count === 0) {
+          const today = new Date(Date.now())
+          dispatch(changeItemCount({
+            id,
+            count: 1,
+            added: today.getDate() + "/" + (today.getMonth() + 1) + "/" + today.getFullYear()
+          }))
+        } else {
+          dispatch(changeItemCount({
+            id,
+            count: 1,
+          }))
+        }
       }
     });
 
@@ -169,12 +193,12 @@ function List() {
       }
         <SwipeableList>
           {items.map(({ id, count, name, thumbnail, added, category }) => (
-            <CSSTransition timeout={2000} in={true} appear={true} classNames="listitem">
+            <CSSTransition key={id} timeout={2000} in={true} appear={true} classNames="listitem">
               <SwipeableListItem
                 key={id}
                 threshold={0.25}
-                swipeLeft={swipeLeftOptions(id)}
-                swipeRight={swipeRightOptions(id)}
+                swipeLeft={swipeLeftOptions(id,count)}
+                swipeRight={swipeRightOptions(id,count)}
               >
 
                   <ComplexListItem
