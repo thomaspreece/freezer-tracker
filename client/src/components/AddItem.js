@@ -46,13 +46,11 @@ function AddItem() {
     const [imagePreviewMode, setImagePreviewMode] = useState(IMAGE_PREVIEW_MODES.HIDDEN)
 
     const hasImageSuggestions = (imageSuggestions.search !== "" &&
-      imageSuggestions.search === name &&
       imageSuggestions.suggestions.length > 0 &&
       imageSuggestions.error === false &&
       imageSuggestions.inProgress === false)
 
     const noImageSuggestions = (imageSuggestions.search !== "" &&
-      imageSuggestions.search === name &&
       imageSuggestions.suggestions.length === 0 &&
       imageSuggestions.error === false &&
       imageSuggestions.inProgress === false)
@@ -176,16 +174,6 @@ function AddItem() {
             {saveFailed === true ? <Alert variant={'danger'}>
                 Saving new item failed
               </Alert> : null}
-
-            {imageSuggestions.inProgress === true ? <Alert variant={'info'}>
-                Loading Suggestions
-              </Alert> : null}
-            {imageSuggestions.error === true ? <Alert variant={'danger'}>
-                Error obtaining image suggestions
-              </Alert> : null}
-            {noImageSuggestions === true ? <Alert variant={'warning'}>
-                Could not find any suggestions for image
-              </Alert> : null}
             <Form id="additem__form" action="/api/items" method="POST">
               <Row>
                 <Col xs={12} md={12} lg={7}>
@@ -256,6 +244,15 @@ function AddItem() {
                 <Col>
                   <img alt="preview" className={`additem__image-preview ${imagePreviewMode === IMAGE_PREVIEW_MODES.UPLOAD ? "preview-shown" : ""}`} id="formImagePreview" />
                   <div className={`additem__image-suggestion ${imagePreviewMode === IMAGE_PREVIEW_MODES.SUGGESTION && hasImageSuggestions ? "preview-shown" : ""}`} >
+                    {imageSuggestions.inProgress === true ? <Alert variant={'info'}>
+                        Loading Suggestions
+                      </Alert> : null}
+                    {imageSuggestions.error === true ? <Alert variant={'danger'}>
+                        Error obtaining image suggestions
+                      </Alert> : null}
+                    {noImageSuggestions === true ? <Alert variant={'warning'}>
+                        Could not find any suggestions for image
+                      </Alert> : null}
                     <Button className="quantity-buttons" variant="secondary" onClick={() => {
                         if((selectedImageSuggestion - 1) <= -1) {
                           setSelectedImageSuggestion(imageSuggestions.suggestions.length - 1)

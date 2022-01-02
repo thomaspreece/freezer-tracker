@@ -10,7 +10,8 @@ export const SORTS={
 export const CATEGORIES = {
   LEFTOVERS: "Leftovers",
   MEAT: "Meat",
-  OTHER: "Other"
+  SAUCES: "Sauces",
+  VEG: "Veg"
 }
 
 export const ALL_CATEGORIES = {
