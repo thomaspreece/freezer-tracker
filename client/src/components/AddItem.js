@@ -126,8 +126,6 @@ function AddItem() {
           formData.append("formImage", image);
         } else if (imagePreviewMode === IMAGE_PREVIEW_MODES.SUGGESTION) {
           formData.append("formImageFetchUrl", imageSuggestions.suggestions[selectedImageSuggestion]);
-        } else {
-          return
         }
 
         // Post data using the Fetch API

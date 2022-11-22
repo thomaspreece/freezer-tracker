@@ -63,6 +63,8 @@ router.post('/items/', upload.single('formImage'), async (req, res, next) => {
         return res.status(400).send(req.fileValidationError);
     }
     const id = uuidv4();
+    var imageUrl = `images/${id}.jpg`;
+    var imageThumbUrl = `images/thumbs/${id}.jpg`
     const outputThumbFilename = `./public/images/thumbs/${id}.jpg`
     const outputFilename = `./public/images/${id}.jpg`
 
@@ -90,7 +92,8 @@ router.post('/items/', upload.single('formImage'), async (req, res, next) => {
       await sharp(tempFilePath)
         .toFile(`./public/images/${id}.jpg`);
     } else {
-      return res.status(400).json({status: 'Error', reason: "Missing Image"});
+      imageUrl = `DefaultImageThumb.jpg`;
+      imageThumbUrl = `DefaultImageThumb.jpg`
     }
 
     const newItem = addItem({
@@ -98,8 +101,8 @@ router.post('/items/', upload.single('formImage'), async (req, res, next) => {
       count: parseInt(req.body.formQuantity, 10),
       name: req.body.formName,
       category: req.body.formCategory,
-      image: `images/${id}.jpg`,
-      thumbnail: `images/thumbs/${id}.jpg`,
+      image: imageUrl,
+      thumbnail: imageThumbUrl,
       added: req.body.formAdded
     })
 

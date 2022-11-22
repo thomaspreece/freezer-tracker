@@ -1,6 +1,6 @@
 {
   "name": "freezx-client",
-  "version": "1.6.0",
+  "version": "1.7.1",
   "private": true,
   "dependencies": {
     "@mdi/js": "^6.5.95",
